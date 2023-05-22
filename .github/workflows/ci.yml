@@ -20,7 +20,7 @@ jobs:
           cd c-blosc
           mkdir build
           cd build
-          cmake ..
+          cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON
           cmake --build . -j8
       
       - name: Build bloscjni
