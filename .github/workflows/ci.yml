@@ -19,7 +19,17 @@ jobs:
           java-version: '8'
           cache: 'maven'
 
-      - name: Build c-blosc
+      - name: Build c-blosc (Windows)
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          cd c-blosc
+          mkdir build
+          cd build
+          cmake -G "MinGW Makefiles" .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j8 --config Release
+
+      - name: Build c-blosc (Linux, Mac)
+        if: ${{ matrix.os != 'windows-latest' }}
         run: |
           cd c-blosc
           mkdir build
