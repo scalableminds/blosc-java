@@ -50,7 +50,7 @@ jobs:
         run: |
           cd bloscjni
           echo $JAVA_HOME
-          ls -lisah ..\\c-blosc\\build
+          ls -lisah ..\\c-blosc\\build\\blosc
           x86_64-w64-mingw32-gcc \
             -c -I"$JAVA_HOME\\include" -I"$JAVA_HOME\\include\\win32" \
             -shared -o libbloscjni.dll \
