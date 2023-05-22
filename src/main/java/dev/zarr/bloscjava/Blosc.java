@@ -3,7 +3,7 @@ package dev.zarr.bloscjava;
 public class Blosc {
 
     static {
-        System.load(System.getProperty("user.dir") + "/bloscjni/bloscjni.dylib");
+        System.load(System.getProperty("user.dir") + "/bloscjni/libbloscjni.so");
     }
 
     public static byte[] compress(byte[] src, int typeSize, Compressor compressor, int compressorLevel, Shuffle shuffle, int blockSize, int numThreads) {
