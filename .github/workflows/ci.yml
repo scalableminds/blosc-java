@@ -98,7 +98,7 @@ jobs:
 
       - name: Rename JNI dynamic libraries
         run: |
-          mv src/main/resources/bloscjni-linux src/main/resources/libbloscjni.so
+          mv src/main/resources/bloscjni-ubuntu src/main/resources/libbloscjni.so
           mv src/main/resources/bloscjni-macos src/main/resources/libbloscjni.dylib
           mv src/main/resources/bloscjni-windows src/main/resources/libbloscjni.dll
 
