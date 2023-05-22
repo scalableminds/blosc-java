@@ -28,7 +28,7 @@ jobs:
           cd bloscjni
           gcc \
             -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" \
-            -shared -fPIC -o libbloscjni.so \
+            -shared -lc -fPIC -o libbloscjni.so \
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build blosc-java
