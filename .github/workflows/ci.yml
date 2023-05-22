@@ -60,10 +60,11 @@ jobs:
         shell: bash
         run: |
           cd bloscjni
+          ls -lihsa ..\\c-blosc\\build\\blosc
           x86_64-w64-mingw32-gcc \
             -I"$JAVA_HOME\\include" -I"$JAVA_HOME\\include\\win32" -O3 \
             -shared -o libbloscjni.dll \
-            bloscjni.c ..\\c-blosc\\build\\blosc\\Release\\libblosc.lib
+            bloscjni.c ..\\c-blosc\\build\\blosc\\libblosc.lib
 
       - name: Build blosc-java
         run: |
