@@ -7,8 +7,8 @@ jobs:
   build_bloscjni:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-latest ]
-    runs-on: ${{ matrix.os }}
+        os: [ ubuntu, windows, macos ]
+    runs-on: ${{ matrix.os }}-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -20,7 +20,7 @@ jobs:
           cache: 'maven'
 
       - name: Build c-blosc (Windows)
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows' }}
         run: |
           cd c-blosc
           mkdir build
@@ -29,7 +29,7 @@ jobs:
           cmake --build . -j8 --config Release
 
       - name: Build c-blosc (Linux, Mac)
-        if: ${{ matrix.os != 'windows-latest' }}
+        if: ${{ matrix.os != 'windows' }}
         run: |
           cd c-blosc
           mkdir build
@@ -41,7 +41,7 @@ jobs:
         run: mkdir src/main/resources
 
       - name: Build bloscjni (Linux)
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'ubuntu' }}
         run: |
           cd bloscjni
           gcc \
@@ -50,7 +50,7 @@ jobs:
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build bloscjni (Mac)
-        if: ${{ matrix.os == 'macos-latest' }}
+        if: ${{ matrix.os == 'macos' }}
         run: |
           cd bloscjni
           gcc \
@@ -59,11 +59,10 @@ jobs:
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build bloscjni (Windows)
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows' }}
         shell: bash
         run: |
           cd bloscjni
-          ls -lihsa ..\\c-blosc\\build\\blosc
           x86_64-w64-mingw32-gcc \
             -I"$JAVA_HOME\\include" -I"$JAVA_HOME\\include\\win32" -O3 \
             -shared -o ..\\src\\main\\resources\\libbloscjni.dll \
@@ -96,6 +95,12 @@ jobs:
       - uses: actions/download-artifact@v3
         with:
           path: src/main/resources
+
+      - name: Rename JNI dynamic libraries
+        run: |
+          mv src/main/resources/bloscjni-linux src/main/resources/libbloscjni.so
+          mv src/main/resources/bloscjni-macos src/main/resources/libbloscjni.dylib
+          mv src/main/resources/bloscjni-windows src/main/resources/libbloscjni.dll
 
       - name: Assembly JAR
         run: |
