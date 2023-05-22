@@ -37,6 +37,9 @@ jobs:
           cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
           cmake --build . -j8 --config Release
 
+      - name: Prepare resources folder
+        run: mkdir src/main/resources
+
       - name: Build bloscjni (Linux)
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
@@ -77,7 +80,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: bloscjni-${{ matrix.os }}
-          path: bloscjni/libbloscjni.*
+          path: src/main/resources/libbloscjni.*
 
   build_jar:
     needs: [ build_bloscjni ]
