@@ -12,8 +12,8 @@ jobs:
           submodules: true
       - uses: actions/setup-java@v3
         with:
-          distribution: 'temurin' # See 'Supported distributions' for available options
-          java-version: '17'
+          distribution: 'temurin'
+          java-version: '8'
 
       - name: Build c-blosc
         run: |
@@ -26,7 +26,7 @@ jobs:
       - name: Build bloscjni
         run: |
           cd bloscjni
-          gcc \
+          cc \
             -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" \
             -shared -lc -fPIC -o libbloscjni.so \
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
