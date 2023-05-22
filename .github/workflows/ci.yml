@@ -4,10 +4,10 @@ on:
   push:
 
 jobs:
-  build:
+  build_bloscjni:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -36,14 +36,14 @@ jobs:
           cd build
           cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
           cmake --build . -j8 --config Release
-      
+
       - name: Build bloscjni (Linux)
         if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           cd bloscjni
           gcc \
             -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" \
-            -shared -lc -fPIC -o libbloscjni.so -O3 \
+            -shared -lc -fPIC -o ../src/main/resources/libbloscjni.so -O3 \
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build bloscjni (Mac)
@@ -52,7 +52,7 @@ jobs:
           cd bloscjni
           gcc \
             -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/darwin" \
-            -dynamiclib -o libbloscjni.dylib -O3 \
+            -dynamiclib -o ../src/main/resources/libbloscjni.dylib -O3 \
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build bloscjni (Windows)
@@ -63,13 +63,13 @@ jobs:
           ls -lihsa ..\\c-blosc\\build\\blosc
           x86_64-w64-mingw32-gcc \
             -I"$JAVA_HOME\\include" -I"$JAVA_HOME\\include\\win32" -O3 \
-            -shared -o libbloscjni.dll \
+            -shared -o ..\\src\\main\\resources\\libbloscjni.dll \
             bloscjni.c ..\\c-blosc\\build\\blosc\\libblosc.a
 
       - name: Build blosc-java
         run: |
           mvn compile
-          
+
       - name: Test blosc-java
         run: |
           mvn test
@@ -78,3 +78,27 @@ jobs:
         with:
           name: bloscjni-${{ matrix.os }}
           path: bloscjni/libbloscjni.*
+
+  build_jar:
+    needs: [ build_bloscjni ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          cache: 'maven'
+
+      - uses: actions/download-artifact@v3
+        with:
+          path: src/main/resources
+
+      - name: Assembly JAR
+        run: |
+          mvn package
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: blosc-jar
+          path: target/*.jar
