@@ -46,12 +46,9 @@ jobs:
 
       - name: Build bloscjni (Windows)
         if: ${{ matrix.os == 'windows-latest' }}
-        shell: bash
         run: |
           cd bloscjni
-          x86_64-w64-mingw32-gcc -c -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" \
-            -shared -o libbloscjni.dll \
-            bloscjni.c "..\c-blosc\build\blosc\libblosc.a"
+          x86_64-w64-mingw32-gcc -c -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" -shared -o libbloscjni.dll bloscjni.c "..\c-blosc\build\blosc\libblosc.a"
 
       - name: Build blosc-java
         run: |
