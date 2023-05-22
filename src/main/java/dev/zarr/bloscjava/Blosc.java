@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
 
 public class Blosc {
     static {
@@ -13,6 +14,18 @@ public class Blosc {
         } catch (IOException e) {
             throw new RuntimeException("Couldn't load libbloscjni.");
         }
+    }
+
+    public static void main(String[] args) {
+        byte[] buf = new byte[256];
+        for (int i = 0; i < buf.length; i++) buf[i] = (byte) (i % 12);
+
+        byte[] compBuf = Blosc.compress(buf, 1, Blosc.Compressor.ZSTD, 9);
+        System.out.println(compBuf.length);
+
+        byte[] decompBuf = Blosc.decompress(compBuf);
+
+        System.out.println(Arrays.equals(buf, decompBuf));
     }
 
     public static byte[] compress(byte[] src, int typeSize, Compressor compressor, int compressorLevel, Shuffle shuffle, int blockSize, int numThreads) {
