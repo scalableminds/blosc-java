@@ -1,9 +1,13 @@
 package dev.zarr.bloscjava;
 
 public class Blosc {
+    private static final String OS = System.getProperty("os.name").toLowerCase();
 
     static {
-        System.load(System.getProperty("user.dir") + "/bloscjni/libbloscjni.so");
+        String extension = ".so";
+        if (OS.contains("mac")) extension = ".dylib";
+        if (OS.contains("win")) extension = ".dll";
+        System.load(System.getProperty("user.dir") + "/bloscjni/libbloscjni" + extension);
     }
 
     public static byte[] compress(byte[] src, int typeSize, Compressor compressor, int compressorLevel, Shuffle shuffle, int blockSize, int numThreads) {

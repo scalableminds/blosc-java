@@ -5,7 +5,10 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -23,13 +26,31 @@ jobs:
           cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON
           cmake --build . -j8
       
-      - name: Build bloscjni
+      - name: Build bloscjni (Linux)
+        if: ${{ matrix.os }} == "ubuntu-latest"
         run: |
           cd bloscjni
-          cc \
+          gcc \
             -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" \
             -shared -lc -fPIC -o libbloscjni.so \
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
+
+      - name: Build bloscjni (Mac)
+        if: ${{ matrix.os }} == "macos-latest"
+        run: |
+          cd bloscjni
+          gcc \
+            -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/darwin" \
+            -dynamiclib -o libbloscjni.dylib \
+            bloscjni.c ../c-blosc/build/blosc/libblosc.a
+
+      - name: Build bloscjni (Windows)
+        if: ${{ matrix.os }} == "windows-latest"
+        run: |
+          cd bloscjni
+          x86_64-w64-mingw32-gcc -c -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" \
+            -shared -o libbloscjni.dll \
+            bloscjni.c "..\c-blosc\build\blosc\libblosc.a"
 
       - name: Build blosc-java
         run: |
