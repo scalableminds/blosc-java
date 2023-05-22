@@ -54,7 +54,7 @@ jobs:
           x86_64-w64-mingw32-gcc \
             -c -I"$JAVA_HOME\\include" -I"$JAVA_HOME\\include\\win32" \
             -shared -o libbloscjni.dll \
-            bloscjni.c ..\\c-blosc\\build\\blosc\\libblosc.a
+            bloscjni.c ..\\c-blosc\\build\\blosc\\libblosc.lib
 
       - name: Build blosc-java
         run: |
