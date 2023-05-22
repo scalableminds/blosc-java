@@ -50,6 +50,7 @@ jobs:
         run: |
           cd bloscjni
           echo $JAVA_HOME
+          tree ..\\c-blosc\\build
           x86_64-w64-mingw32-gcc \
             -c -I"$JAVA_HOME\\include" -I"$JAVA_HOME\\include\\win32" \
             -shared -o libbloscjni.dll \
