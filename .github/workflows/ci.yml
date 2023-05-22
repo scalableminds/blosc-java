@@ -27,7 +27,7 @@ jobs:
           cmake --build . -j8
       
       - name: Build bloscjni (Linux)
-        if: ${{ matrix.os }} == "ubuntu-latest"
+        if: ${{ matrix.os == "ubuntu-latest" }}
         run: |
           cd bloscjni
           gcc \
@@ -36,7 +36,7 @@ jobs:
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build bloscjni (Mac)
-        if: ${{ matrix.os }} == "macos-latest"
+        if: ${{ matrix.os == "macos-latest" }}
         run: |
           cd bloscjni
           gcc \
@@ -45,7 +45,7 @@ jobs:
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build bloscjni (Windows)
-        if: ${{ matrix.os }} == "windows-latest"
+        if: ${{ matrix.os == "windows-latest" }}
         run: |
           cd bloscjni
           x86_64-w64-mingw32-gcc -c -I"%JAVA_HOME%\include" -I"%JAVA_HOME%\include\win32" \
