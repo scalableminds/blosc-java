@@ -7,9 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
 public class Blosc {
-    private static final String OS = System.getProperty("os.name").toLowerCase();
-
-
     static {
         try {
             System.load(loadLibraryFromJarToTemp().getAbsolutePath());
@@ -57,12 +54,13 @@ public class Blosc {
 
 
     private static File loadLibraryFromJarToTemp() throws IOException {
+        final String os = System.getProperty("os.name").toLowerCase();
         final String filePrefix = "libbloscjni";
         InputStream is = null;
         try {
             String extension = ".so";
-            if (OS.contains("mac")) extension = ".dylib";
-            if (OS.contains("win")) extension = ".dll";
+            if (os.contains("mac")) extension = ".dylib";
+            if (os.contains("win")) extension = ".dll";
 
             // attempt to look up the static library in the jar file
             String libraryFileName = filePrefix + extension;

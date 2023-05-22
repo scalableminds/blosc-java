@@ -104,7 +104,7 @@ jobs:
 
       - name: Assembly JAR
         run: |
-          mvn package
+          mvn package -Dmaven.test.skip
 
       - uses: actions/upload-artifact@v3
         with:
