@@ -36,5 +36,5 @@ build/
 
 ### Mac OS ###
 .DS_Store
-/bloscjni/libbloscjni.*
+/src/main/resources/libbloscjni.*
 
