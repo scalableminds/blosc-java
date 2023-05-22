@@ -108,3 +108,5 @@ jobs:
         with:
           name: blosc-jar
           path: target/*.jar
+
+      - run: java -cp target/*.jar dev.zarr.bloscjava.Blosc
