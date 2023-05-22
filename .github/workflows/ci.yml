@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: '17'
+
+      - name: Build c-blosc
+        run: |
+          cd c-blosc
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build .
+      
+      - name: Build bloscjni
+        run: |
+          cd bloscjni
+          gcc \
+            -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/darwin" \
+            -dynamiclib -o libbloscjni.so \
+            bloscjni.c ../c-blosc/build/blosc/libblosc.a
+
+      - name: Build blosc-java
+        run: |
+          mvn compile
+          
+      - name: Test blosc-java
+        run: |
+          mvn test
