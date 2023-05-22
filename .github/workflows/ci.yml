@@ -24,7 +24,7 @@ jobs:
           mkdir build
           cd build
           cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
-          cmake --build . -j8
+          cmake --build . -j8 --config Release
       
       - name: Build bloscjni (Linux)
         if: ${{ matrix.os == 'ubuntu-latest' }}
