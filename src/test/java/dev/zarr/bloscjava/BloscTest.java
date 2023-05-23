@@ -21,6 +21,8 @@ public class BloscTest {
         System.out.println(Arrays.toString(buf));
         System.out.println(Arrays.toString(compBuf));
         System.out.println(Arrays.toString(decompBuf));
+
+        assert Arrays.equals(buf, decompBuf);
     }
 
 }

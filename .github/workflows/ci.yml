@@ -69,12 +69,10 @@ jobs:
             bloscjni.c ..\\c-blosc\\build\\blosc\\libblosc.a
 
       - name: Build blosc-java
-        run: |
-          mvn compile
+        run: mvn compile
 
       - name: Test blosc-java
-        run: |
-          mvn test
+        run: mvn test
 
       - uses: actions/upload-artifact@v3
         with:
@@ -86,6 +84,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          submodules: true
       - uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -97,16 +97,18 @@ jobs:
           path: src/main/resources
 
       - name: Rename JNI dynamic libraries
-        run: |
-          mv src/main/resources/*/* src/main/resources
+        run: mv src/main/resources/*/* src/main/resources
 
-      - name: Assembly JAR
-        run: |
-          mvn package
+      - name: Append c-blosc license
+        run: cat c-blosc/LICENSE.txt >> LICENSE.txt
+
+      - name: Assemble JAR
+        run: mvn package
 
       - uses: actions/upload-artifact@v3
         with:
           name: blosc-jar
           path: target/*.jar
 
-      - run: java -cp target/*.jar dev.zarr.bloscjava.Blosc
+      - name: Smoke test
+        run: java -cp target/*.jar dev.zarr.bloscjava.Blosc
