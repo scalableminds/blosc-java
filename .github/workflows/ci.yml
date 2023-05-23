@@ -19,6 +19,9 @@ jobs:
           java-version: '8'
           cache: 'maven'
 
+      - name: Prepare resources folder
+        run: mkdir src/main/resources
+
       - name: Build c-blosc (Windows)
         if: ${{ matrix.os == 'windows' }}
         run: |
@@ -27,36 +30,6 @@ jobs:
           cd build
           cmake -G "MinGW Makefiles" .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
           cmake --build . -j8 --config Release
-
-      - name: Build c-blosc (Linux, Mac)
-        if: ${{ matrix.os != 'windows' }}
-        run: |
-          cd c-blosc
-          mkdir build
-          cd build
-          cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
-          cmake --build . -j8 --config Release
-
-      - name: Prepare resources folder
-        run: mkdir src/main/resources
-
-      - name: Build bloscjni (Linux)
-        if: ${{ matrix.os == 'ubuntu' }}
-        run: |
-          cd bloscjni
-          gcc \
-            -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" \
-            -shared -lc -fPIC -o ../src/main/resources/libbloscjni.so -O3 \
-            bloscjni.c ../c-blosc/build/blosc/libblosc.a
-
-      - name: Build bloscjni (Mac)
-        if: ${{ matrix.os == 'macos' }}
-        run: |
-          cd bloscjni
-          gcc \
-            -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/darwin" \
-            -dynamiclib -o ../src/main/resources/libbloscjni.dylib -O3 \
-            bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build bloscjni (Windows)
         if: ${{ matrix.os == 'windows' }}
@@ -67,6 +40,71 @@ jobs:
             -I"$JAVA_HOME\\include" -I"$JAVA_HOME\\include\\win32" -O3 \
             -shared -o ..\\src\\main\\resources\\libbloscjni.dll \
             bloscjni.c ..\\c-blosc\\build\\blosc\\libblosc.a
+
+      - name: Build c-blosc (Mac arm64)
+        if: ${{ matrix.os == 'macos' }}
+        run: |
+          cd c-blosc
+          mkdir build-arm64
+          cd build-arm64
+          cmake .. \
+            -DCMAKE_OSX_ARCHITECTURES=arm64 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
+            -DDEACTIVATE_AVX2=ON \
+            -DDEACTIVATE_SSE2=ON \
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j8 --config Release --target blosc_static
+
+      - name: Build c-blosc (Mac x86_64)
+        if: ${{ matrix.os == 'macos' }}
+        run: |
+          cd c-blosc
+          mkdir build-x86_64
+          cd build-x86_64
+          cmake .. \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j8 --config Release --target blosc_static
+
+      - name: Build bloscjni (Mac universal)
+        if: ${{ matrix.os == 'macos' }}
+        run: |
+          cd bloscjni
+          cc \
+            -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/darwin" \
+            --target=arm64-apple-macos10.9 \
+            -dynamiclib -o ../src/main/resources/libbloscjni-arm64.dylib -O3 \
+            bloscjni.c ../c-blosc/build-arm64/blosc/libblosc.a
+          cc \
+            -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/darwin" \
+            --target=x86_64-apple-macos10.9 \
+            -dynamiclib -o ../src/main/resources/libbloscjni-x86_64.dylib -O3 \
+            bloscjni.c ../c-blosc/build-x86_64/blosc/libblosc.a
+          lipo -create \
+            -output ../src/main/resources/libbloscjni.dylib \
+            ../src/main/resources/libbloscjni-arm64.dylib \
+            ../src/main/resources/libbloscjni-x86_64.dylib
+          rm ../src/main/resources/libbloscjni-*.dylib
+
+      - name: Build c-blosc (Linux)
+        if: ${{ matrix.os == 'ubuntu' }}
+        run: |
+          cd c-blosc
+          mkdir build
+          cd build
+          cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j8 --config Release
+
+      - name: Build bloscjni (Linux)
+        if: ${{ matrix.os == 'ubuntu' }}
+        run: |
+          cd bloscjni
+          gcc \
+            -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" \
+            -shared -lc -fPIC -o ../src/main/resources/libbloscjni.so -O3 \
+            bloscjni.c ../c-blosc/build/blosc/libblosc.a
 
       - name: Build blosc-java
         run: mvn compile
