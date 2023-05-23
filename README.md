@@ -1,6 +1,6 @@
 # blosc-java
 
-A cross-platform JNI-based wrapper around the [c-blosc](https://github.com/Blosc/c-blosc) library.
+A stateless, cross-platform, JNI-based wrapper around the [c-blosc](https://github.com/Blosc/c-blosc) library.
 
 The packaged JARs contain binaries for Windows, Mac OS (x86_64 only) and Linux.
 
@@ -43,3 +43,16 @@ byte[] decompress(byte[] src, int numThreads)
 - `src`: Byte array to be decompressed. Required.
 - `numThreads`: Number of threads to be used internally. Default: 1.
 
+## Installation
+
+Add the `dev.zarr.blosc-java` dependency to your Maven project:
+
+```xml
+    <dependencies>
+        <dependency>
+            <groupId>dev.zarr</groupId>
+            <artifactId>blosc-java</artifactId>
+            <version>BLOSC_VERSION</version>
+        </dependency>
+    </dependencies>
+```
