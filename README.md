@@ -9,7 +9,7 @@ The packaged JARs contain binaries for Windows, Mac OS (x86_64 only) and Linux.
 import dev.zarr.bloscjava.Blosc;
 
 // Generate some random data
-int SIZE = 100 * 100 * 100;
+int SIZE = 1000000;
 byte[] buf = new byte[SIZE];
 for (int i = 0; i < SIZE; i++) {
     buf[i] = (int)(i % 24);
@@ -23,7 +23,15 @@ assert Arrays.equals(buf, decompressedBuf);
 
 ### API
 ```java
-byte[] compress(byte[] src, int typeSize, Compressor compressor, int compressorLevel, Shuffle shuffle, int blockSize, int numThreads)
+byte[] compress(
+    byte[] src, 
+    int typeSize, 
+    Blosc.Compressor compressor, 
+    int compressorLevel, 
+    Blosc.Shuffle shuffle, 
+    int blockSize,
+    int numThreads
+)
 ```
 
 - `src`: Byte array to be compressed. Required.
