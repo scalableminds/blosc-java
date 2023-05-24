@@ -6,45 +6,51 @@
 
     <groupId>dev.zarr</groupId>
     <artifactId>blosc-java</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1-1.21.4-SNAPSHOT</version>
+
+    <name>blosc-java</name>
+    <description>A Java library for the Blosc codec that wraps around the c-blosc library with JNI.</description>
+    <url>https://github.com/scalableminds/blosc-java</url>
 
     <licenses>
         <license>
-            <name>MIT</name>
-            <url>https://unlicense.org/</url>
+            <name>MIT license</name>
+            <url>https://github.com/scalableminds/blosc-java/blob/main/LICENSE.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
+
+    <developers>
+        <developer>
+            <name>Norman Rzepka</name>
+            <email>hello@scalableminds.com</email>
+            <organization>scalable minds</organization>
+            <organizationUrl>https://scalableminds.com</organizationUrl>
+        </developer>
+    </developers>
+
     <scm>
         <connection>scm:git:https://github.com/scalableminds/blosc-java</connection>
         <developerConnection>scm:git:git@github.com:scalableminds/blosc-java</developerConnection>
-        <tag>HEAD</tag>
         <url>https://github.com/scalableminds/blosc-java</url>
     </scm>
+
     <issueManagement>
         <system>GitHub Issues</system>
         <url>https://github.com/scalableminds/blosc-java/issues</url>
     </issueManagement>
+
     <ciManagement>
         <system>GitHub Actions</system>
         <url>https://github.com/scalableminds/blosc-java/actions</url>
     </ciManagement>
-
-    <contributors>
-        <contributor>
-            <name>Norman Rzepka</name>
-            <url>https://twitter.com/normanrz</url>
-            <properties>
-                <id>normanrz</id>
-            </properties>
-        </contributor>
-    </contributors>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
     <dependencies>
         <!-- Test dependencies -->
         <dependency>
