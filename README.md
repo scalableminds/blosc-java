@@ -2,7 +2,7 @@
 
 A stateless, cross-platform, JNI-based wrapper around the [c-blosc](https://github.com/Blosc/c-blosc) library.
 
-The packaged JARs contain binaries for Windows, Mac OS (x86_64 only) and Linux.
+The packaged JARs contain binaries for Windows, Mac OS (x86_64 and arm64) and Linux.
 
 ## Usage
 ```java
