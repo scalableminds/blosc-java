@@ -40,7 +40,7 @@ byte[] compress(
   Default: `ZSTD`
 - `compressorLevel`: Number from 0 to 9 (0 = little compression, 9 = strongest compression). Default: 5.
 - `shuffle`: Whether to use shuffling. Available choices: `NOSHUFFLE`, `BIT_SHUFFLE`, `BYTE_SHUFFLE`. Default: 
-  `BIT_SHUFFLE` for typeSize == 1, `BYTE_SHUFFLE` else
+  `BIT_SHUFFLE` for typeSize == 1, `BYTE_SHUFFLE` otherwise.
 - `blockSize`: Requested size of compressed blocks. Use 0 for automatic block sizes.
 - `numThreads`: Number of threads to be used internally. Default: 1.
 

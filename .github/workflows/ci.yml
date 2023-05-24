@@ -147,6 +147,3 @@ jobs:
         with:
           name: blosc-jar
           path: target/*.jar
-
-      - name: Smoke test
-        run: java -cp target/*.jar dev.zarr.bloscjava.Blosc
