@@ -27,7 +27,7 @@ public class Blosc {
      *
      * @param src             Byte array to be compressed.
      * @param typeSize        Number of bytes per primitive value (e.g. 1 for int8, 2 for int16, 4 for int32).
-     * @param compressor      Compression algorithm. Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD, SNAPPY, ZLIB.
+     * @param compressor      Compression algorithm. Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD<, ZLIB.
      * @param compressorLevel Number from 0 to 9 (0 = little compression, 9 = strongest compression).
      * @param shuffle         Whether to use shuffling. Available choices: NOSHUFFLE, BIT_SHUFFLE, BYTE_SHUFFLE. Recommended:
      *                        BIT_SHUFFLE for typeSize == 1, BYTE_SHUFFLE otherwise.
@@ -44,7 +44,7 @@ public class Blosc {
      *
      * @param src             Byte array to be compressed.
      * @param typeSize        Number of bytes per primitive value (e.g. 1 for int8, 2 for int16, 4 for int32).
-     * @param compressor      Compression algorithm. Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD, SNAPPY, ZLIB.
+     * @param compressor      Compression algorithm. Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD<, ZLIB.
      * @param compressorLevel Number from 0 to 9 (0 = little compression, 9 = strongest compression).
      * @param shuffle         Whether to use shuffling. Available choices: NOSHUFFLE, BIT_SHUFFLE, BYTE_SHUFFLE. Recommended:
      *                        BIT_SHUFFLE for typeSize == 1, BYTE_SHUFFLE otherwise.
@@ -60,7 +60,8 @@ public class Blosc {
      *
      * @param src             Byte array to be compressed.
      * @param typeSize        Number of bytes per primitive value (e.g. 1 for int8, 2 for int16, 4 for int32).
-     * @param compressor      Compression algorithm. Available choices: Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD, SNAPPY, ZLIB.
+     * @param compressor      Compression algorithm. Available choices: Available choices: LZ4, LZ4HC, BLOSCLZ,
+     *                        ZSTD<, ZLIB.
      * @param compressorLevel Number from 0 to 9 (0 = little compression, 9 = strongest compression).
      * @param shuffle         Whether to use shuffling. Available choices: NOSHUFFLE, BIT_SHUFFLE, BYTE_SHUFFLE. Recommended:
      *                        BIT_SHUFFLE for typeSize == 1, BYTE_SHUFFLE otherwise.
@@ -75,7 +76,7 @@ public class Blosc {
      *
      * @param src             Byte array to be compressed.
      * @param typeSize        Number of bytes per primitive value (e.g. 1 for int8, 2 for int16, 4 for int32).
-     * @param compressor      Compression algorithm. Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD, SNAPPY, ZLIB.
+     * @param compressor      Compression algorithm. Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD<, ZLIB.
      * @param compressorLevel Number from 0 to 9 (0 = little compression, 9 = strongest compression).
      * @return the compressed byte array
      */
@@ -89,7 +90,7 @@ public class Blosc {
      *
      * @param src        Byte array to be compressed.
      * @param typeSize   Number of bytes per primitive value (e.g. 1 for int8, 2 for int16, 4 for int32).
-     * @param compressor Compression algorithm. Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD, SNAPPY, ZLIB.
+     * @param compressor Compression algorithm. Available choices: LZ4, LZ4HC, BLOSCLZ, ZSTD<, ZLIB.
      * @return the compressed byte array
      */
     public static byte[] compress(byte[] src, int typeSize, Compressor compressor) {
@@ -188,10 +189,6 @@ public class Blosc {
          * <a href="https://facebook.github.io/zstd/">Zstandard compression</a>
          */
         ZSTD("zstd"),
-        /**
-         * <a href="https://google.github.io/snappy/">Snappy compression</a>
-         */
-        SNAPPY("snappy"),
         /**
          * <a href="https://zlib.net/">Zlib compression</a>
          */

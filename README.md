@@ -36,7 +36,7 @@ byte[] compress(
 
 - `src`: Byte array to be compressed. Required.
 - `typeSize`: Number of bytes per primitive value (e.g. 1 for int8, 2 for int16, 4 for int32). Required.
-- `compressor`: Compression algorithm. Available choices: `LZ4`, `LZ4HC`, `BLOSCLZ`, `ZSTD`, `SNAPPY`, `ZLIB`. 
+- `compressor`: Compression algorithm. Available choices: `LZ4`, `LZ4HC`, `BLOSCLZ`, `ZSTD`, `ZLIB`. 
   Default: `ZSTD`
 - `compressorLevel`: Number from 0 to 9 (0 = little compression, 9 = strongest compression). Default: 5.
 - `shuffle`: Whether to use shuffling. Available choices: `NOSHUFFLE`, `BIT_SHUFFLE`, `BYTE_SHUFFLE`. Default: 
