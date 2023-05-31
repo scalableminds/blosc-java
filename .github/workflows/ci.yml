@@ -88,23 +88,31 @@ jobs:
             ../src/main/resources/libbloscjni-x86_64.dylib
           rm ../src/main/resources/libbloscjni-*.dylib
 
+      - name: Build CentOS7 docker (Linux)
+        if: ${{ matrix.os == 'ubuntu' }}
+        run: |
+          cd bloscjni
+          docker build -t centos7-jdk8 -f Dockerfile.centos7 .
+
       - name: Build c-blosc (Linux)
         if: ${{ matrix.os == 'ubuntu' }}
         run: |
-          cd c-blosc
+          docker run -i -v$(pwd):/app -w /app/c-blosc centos7-jdk8 bash << EOF
           mkdir build
           cd build
           cmake .. -DCMAKE_POSITION_INDEPENDENT_CODE=ON -DCMAKE_BUILD_TYPE=Release
           cmake --build . -j8 --config Release
+          EOF
 
       - name: Build bloscjni (Linux)
         if: ${{ matrix.os == 'ubuntu' }}
         run: |
+          docker run -i -v$(pwd):/app -w /app centos7-jdk8 bash <<EOF
           cd bloscjni
-          gcc \
-            -I"$JAVA_HOME/include" -I"$JAVA_HOME/include/linux" \
+          gcc -I"\$JAVA_HOME/include" -I"\$JAVA_HOME/include/linux" \
             -shared -lc -fPIC -o ../src/main/resources/libbloscjni.so -O3 \
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
+          EOF
 
       - name: Build blosc-java
         run: mvn compile
