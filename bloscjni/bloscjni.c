@@ -1,7 +1,7 @@
-#include "dev_zarr_bloscjava_Blosc.h"
+#include "com_scalableminds_bloscjava_Blosc.h"
 #include "../c-blosc/blosc/blosc.h"
 
-JNIEXPORT jbyteArray JNICALL Java_dev_zarr_bloscjava_Blosc__1compress(JNIEnv *env, jclass thisClass, jbyteArray src, jint typesize, jint clevel, jint shuffle, jint blocksize, jstring cname, jint numinternalthreads)
+JNIEXPORT jbyteArray JNICALL Java_com_scalableminds_bloscjava_Blosc__1compress(JNIEnv *env, jclass thisClass, jbyteArray src, jint typesize, jint clevel, jint shuffle, jint blocksize, jstring cname, jint numinternalthreads)
 {
   // Reading source buffer
   jboolean isCopy;
@@ -59,7 +59,7 @@ JNIEXPORT jbyteArray JNICALL Java_dev_zarr_bloscjava_Blosc__1compress(JNIEnv *en
   return dest;
 }
 
-JNIEXPORT jbyteArray JNICALL Java_dev_zarr_bloscjava_Blosc__1decompress(JNIEnv *env, jclass thisClass, jbyteArray src, jint numinternalthreads)
+JNIEXPORT jbyteArray JNICALL Java_com_scalableminds_bloscjava_Blosc__1decompress(JNIEnv *env, jclass thisClass, jbyteArray src, jint numinternalthreads)
 {
   // Reading source buffer
   jboolean isCopy;
