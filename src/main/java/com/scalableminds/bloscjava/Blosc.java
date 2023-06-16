@@ -1,4 +1,4 @@
-package dev.zarr.bloscjava;
+package com.scalableminds.bloscjava;
 
 import java.io.File;
 import java.io.IOException;

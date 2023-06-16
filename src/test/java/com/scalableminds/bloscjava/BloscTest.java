@@ -1,4 +1,4 @@
-package dev.zarr.bloscjava;
+package com.scalableminds.bloscjava;
 
 import org.junit.jupiter.api.Test;
 
