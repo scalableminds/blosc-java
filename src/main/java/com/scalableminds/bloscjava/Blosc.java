@@ -198,6 +198,19 @@ public class Blosc {
         Compressor(String compressor) {
             this.compressor = compressor;
         }
+
+        public static Compressor fromString(String compressor) {
+            for (Compressor e : values()) {
+                if (e.compressor.equals(compressor)) {
+                    return e;
+                }
+            }
+            return null;
+        }
+
+        public String getValue() {
+            return compressor;
+        }
     }
 
     /**
@@ -220,6 +233,19 @@ public class Blosc {
 
         Shuffle(int shuffle) {
             this.shuffle = shuffle;
+        }
+
+        public static Shuffle fromInt(int shuffle) {
+            for (Shuffle e : values()) {
+                if (e.shuffle == shuffle) {
+                    return e;
+                }
+            }
+            return null;
+        }
+
+        public int getValue() {
+            return shuffle;
         }
     }
 }
