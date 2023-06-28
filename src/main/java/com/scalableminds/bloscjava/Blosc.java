@@ -36,6 +36,9 @@ public class Blosc {
      * @return the compressed byte array
      */
     public static byte[] compress(byte[] src, int typeSize, Compressor compressor, int compressorLevel, Shuffle shuffle, int blockSize, int numThreads) {
+        if (typeSize <1) {
+            throw new IllegalArgumentException("Argument typeSize needs to be larger than 0.");
+        }
         return _compress(src, typeSize, compressorLevel, shuffle.shuffle, blockSize, compressor.compressor, numThreads);
     }
 
