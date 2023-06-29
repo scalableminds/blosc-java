@@ -1,64 +1,141 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.scalableminds</groupId>
-    <artifactId>blosc-java</artifactId>
-    <version>0.1-1.21.4-SNAPSHOT</version>
+  <groupId>com.scalableminds</groupId>
+  <artifactId>blosc-java</artifactId>
+  <version>0.1-1.21.4-SNAPSHOT</version>
 
-    <name>blosc-java</name>
-    <description>A Java library for the Blosc codec that wraps around the c-blosc library with JNI.</description>
+  <name>blosc-java</name>
+  <description>A Java library for the Blosc codec that wraps around the c-blosc library with JNI.
+  </description>
+  <url>https://github.com/scalableminds/blosc-java</url>
+
+  <licenses>
+    <license>
+      <name>MIT license</name>
+      <url>https://github.com/scalableminds/blosc-java/blob/main/LICENSE.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-gpg-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <id>sign-artifacts</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>sign</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.kordamp.maven</groupId>
+        <artifactId>pomchecker-maven-plugin</artifactId>
+        <version>1.9.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <id>attach-javadoc</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <id>attach-source</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.jreleaser</groupId>
+        <artifactId>jreleaser-maven-plugin</artifactId>
+        <version>1.7.0</version>
+        <configuration>
+          <jreleaser>
+            <signing>
+              <active>ALWAYS</active>
+              <armored>true</armored>
+            </signing>
+            <deploy>
+              <maven>
+                <nexus2>
+                  <maven-central>
+                    <active>ALWAYS</active>
+                    <url>https://s01.oss.sonatype.org/service/local</url>;
+                    <closeRepository>false</closeRepository>
+                    <releaseRepository>false</releaseRepository>
+                    <stagingRepositories>target/staging-deploy</stagingRepositories>
+                  </maven-central>
+                </nexus2>
+              </maven>
+            </deploy>
+          </jreleaser>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <developers>
+    <developer>
+      <name>Norman Rzepka</name>
+      <email>hello@scalableminds.com</email>
+      <organization>scalable minds</organization>
+      <organizationUrl>https://scalableminds.com</organizationUrl>
+    </developer>
+  </developers>
+
+  <scm>
+    <connection>scm:git:https://github.com/scalableminds/blosc-java</connection>
+    <developerConnection>scm:git:git@github.com:scalableminds/blosc-java</developerConnection>
     <url>https://github.com/scalableminds/blosc-java</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>MIT license</name>
-            <url>https://github.com/scalableminds/blosc-java/blob/main/LICENSE.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+  <issueManagement>
+    <system>GitHub Issues</system>
+    <url>https://github.com/scalableminds/blosc-java/issues</url>
+  </issueManagement>
 
-    <developers>
-        <developer>
-            <name>Norman Rzepka</name>
-            <email>hello@scalableminds.com</email>
-            <organization>scalable minds</organization>
-            <organizationUrl>https://scalableminds.com</organizationUrl>
-        </developer>
-    </developers>
+  <ciManagement>
+    <system>GitHub Actions</system>
+    <url>https://github.com/scalableminds/blosc-java/actions</url>
+  </ciManagement>
 
-    <scm>
-        <connection>scm:git:https://github.com/scalableminds/blosc-java</connection>
-        <developerConnection>scm:git:git@github.com:scalableminds/blosc-java</developerConnection>
-        <url>https://github.com/scalableminds/blosc-java</url>
-    </scm>
+  <properties>
+    <maven.compiler.source>8</maven.compiler.source>
+    <maven.compiler.target>8</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
 
-    <issueManagement>
-        <system>GitHub Issues</system>
-        <url>https://github.com/scalableminds/blosc-java/issues</url>
-    </issueManagement>
-
-    <ciManagement>
-        <system>GitHub Actions</system>
-        <url>https://github.com/scalableminds/blosc-java/actions</url>
-    </ciManagement>
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
-
-    <dependencies>
-        <!-- Test dependencies -->
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>5.9.3</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <!-- Test dependencies -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.9.3</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
 
 </project>
