@@ -6,7 +6,7 @@
 
   <groupId>com.scalableminds</groupId>
   <artifactId>blosc-java</artifactId>
-  <version>0.1-1.21.4-SNAPSHOT</version>
+  <version>0.1-1.21.4</version>
   <inceptionYear>2023</inceptionYear>
 
   <name>blosc-java</name>
