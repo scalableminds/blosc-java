@@ -165,5 +165,6 @@ jobs:
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
           JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          mkdir -p target/staging-deploy
           mvn -Prelease jreleaser:deploy
           
