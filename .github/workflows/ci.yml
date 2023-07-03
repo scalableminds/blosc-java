@@ -125,7 +125,7 @@ jobs:
           name: bloscjni-${{ matrix.os }}
           path: src/main/resources
 
-  build_jar:
+  build_publish_jar:
     needs: [ build_bloscjni ]
     runs-on: ubuntu-latest
     steps:
@@ -155,3 +155,15 @@ jobs:
         with:
           name: blosc-jar
           path: target/*.jar
+
+      - name: Publish to Maven Central
+        env:
+          JRELEASER_NEXUS2_USERNAME: ${{ secrets.JRELEASER_NEXUS2_USERNAME }}
+          JRELEASER_NEXUS2_PASSWORD: ${{ secrets.JRELEASER_NEXUS2_PASSWORD }}
+          JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
+          JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
+          JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}
+          JRELEASER_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mvn jreleaser:deploy
+          
