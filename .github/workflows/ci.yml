@@ -23,7 +23,7 @@ jobs:
         run: mkdir src/main/resources
 
       - name: Build c-blosc (Windows)
-        if: ${{ matrix.os == 'windows' }}
+        if: ${{ matrix.os == 'windows-latest' }}
         run: |
           cd c-blosc
           mkdir build
@@ -32,7 +32,7 @@ jobs:
           cmake --build . -j8 --config Release
 
       - name: Build bloscjni (Windows)
-        if: ${{ matrix.os == 'windows' }}
+        if: ${{ matrix.os == 'windows-latest' }}
         shell: bash
         run: |
           cd bloscjni
@@ -42,7 +42,7 @@ jobs:
             bloscjni.c ..\\c-blosc\\build\\blosc\\libblosc.a
 
       - name: Build c-blosc (Mac arm64)
-        if: ${{ matrix.os == 'macos' }}
+        if: ${{ matrix.os == 'macos-12' }}
         run: |
           cd c-blosc
           mkdir build-arm64
@@ -57,7 +57,7 @@ jobs:
           cmake --build . -j8 --config Release --target blosc_static
 
       - name: Build c-blosc (Mac x86_64)
-        if: ${{ matrix.os == 'macos' }}
+        if: ${{ matrix.os == 'macos-12' }}
         run: |
           cd c-blosc
           mkdir build-x86_64
@@ -69,7 +69,7 @@ jobs:
           cmake --build . -j8 --config Release --target blosc_static
 
       - name: Build bloscjni (Mac universal)
-        if: ${{ matrix.os == 'macos' }}
+        if: ${{ matrix.os == 'macos-12' }}
         run: |
           cd bloscjni
           cc \
@@ -89,13 +89,13 @@ jobs:
           rm ../src/main/resources/libbloscjni-*.dylib
 
       - name: Build CentOS7 docker (Linux)
-        if: ${{ matrix.os == 'ubuntu' }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           cd bloscjni
           docker build -t centos7-jdk8 -f Dockerfile.centos7 .
 
       - name: Build c-blosc (Linux)
-        if: ${{ matrix.os == 'ubuntu' }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           docker run -i -v$(pwd):/app -w /app/c-blosc centos7-jdk8 bash << EOF
           mkdir build
@@ -105,7 +105,7 @@ jobs:
           EOF
 
       - name: Build bloscjni (Linux)
-        if: ${{ matrix.os == 'ubuntu' }}
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
           docker run -i -v$(pwd):/app -w /app centos7-jdk8 bash <<EOF
           cd bloscjni
