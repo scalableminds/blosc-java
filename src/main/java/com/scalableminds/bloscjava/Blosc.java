@@ -251,7 +251,7 @@ public class Blosc {
     /**
      * Byte-wise shuffling
      */
-    BYTE_SHUFFLE(1, "byteshuffle"),
+    BYTE_SHUFFLE(1, "shuffle"),
     /**
      * Bit-wise shuffling
      */
