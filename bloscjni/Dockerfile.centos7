@@ -13,4 +13,4 @@ RUN cd /usr/local/src && \
   mv cmake-3.22.2-linux-x86_64 /usr/local/cmake
 
 ENV PATH="/usr/local/cmake/bin:$PATH"
-ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.372.b07-1.el7_9.x86_64
+ENV JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-1.8.0.412.b08-1.el7_9.x86_64
