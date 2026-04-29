@@ -43,7 +43,9 @@ jobs:
 
       - name: Install CMake 3.x (Mac)
         if: ${{ matrix.os == 'macos-latest' }}
-        run: pip3 install 'cmake<4'
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "~3"
 
       - name: Build c-blosc (Mac arm64)
         if: ${{ matrix.os == 'macos-latest' }}
