@@ -120,7 +120,7 @@ jobs:
       - name: Test blosc-java
         run: mvn test
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: bloscjni-${{ matrix.os }}
           path: src/main/resources
@@ -173,7 +173,7 @@ jobs:
       - name: Test blosc-java
         run: mvn test
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: bloscjni-linux-arm64
           path: src/main/resources
@@ -191,7 +191,7 @@ jobs:
           java-version: '8'
           cache: 'maven'
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: src/main/resources
 
@@ -204,7 +204,7 @@ jobs:
       - name: Assemble JAR
         run: mvn package
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: blosc-jar
           path: target/*.jar
