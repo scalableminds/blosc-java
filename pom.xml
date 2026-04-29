@@ -6,7 +6,7 @@
 
   <groupId>com.scalableminds</groupId>
   <artifactId>blosc-java</artifactId>
-  <version>0.2-1.21.4</version>
+  <version>0.3-1.21.6</version>
   <inceptionYear>2023</inceptionYear>
 
   <name>blosc-java</name>
@@ -76,7 +76,7 @@
           <plugin>
             <groupId>org.jreleaser</groupId>
             <artifactId>jreleaser-maven-plugin</artifactId>
-            <version>1.7.0</version>
+            <version>1.15.0</version>
             <configuration>
               <jreleaser>
                 <signing>
@@ -85,17 +85,13 @@
                 </signing>
                 <deploy>
                   <maven>
-                    <nexus2>
-                      <maven-central>
+                    <mavenCentral>
+                      <sonatype>
                         <active>ALWAYS</active>
-                        <url>https://oss.sonatype.org/service/local</url>
-                        <snapshotUrl>https://oss.sonatype.org/content/repositories/snapshots/
-                        </snapshotUrl>
-                        <closeRepository>false</closeRepository>
-                        <releaseRepository>false</releaseRepository>
+                        <url>https://central.sonatype.com/api/v1/publisher</url>
                         <stagingRepositories>target/staging-deploy</stagingRepositories>
-                      </maven-central>
-                    </nexus2>
+                      </sonatype>
+                    </mavenCentral>
                   </maven>
                 </deploy>
               </jreleaser>
