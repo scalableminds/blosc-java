@@ -110,7 +110,7 @@ jobs:
           docker run -i -v$(pwd):/app -w /app centos7-jdk8 bash <<EOF
           cd bloscjni
           gcc -I"\$JAVA_HOME/include" -I"\$JAVA_HOME/include/linux" \
-            -shared -lc -fPIC -o ../src/main/resources/libbloscjni.so -O3 \
+            -shared -lc -fPIC -o ../src/main/resources/libbloscjni-amd64.so -O3 \
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
           EOF
 
@@ -125,8 +125,61 @@ jobs:
           name: bloscjni-${{ matrix.os }}
           path: src/main/resources
 
+  build_bloscjni_linux_arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+          cache: 'maven'
+
+      - name: Prepare resources folder
+        run: mkdir src/main/resources
+
+      - name: Build ubuntu20 arm64 docker
+        run: |
+          cd bloscjni
+          docker build -t ubuntu20-arm64-jdk8 -f Dockerfile.ubuntu20-arm64 .
+
+      - name: Build c-blosc (Linux arm64)
+        run: |
+          docker run -i -v$(pwd):/app -w /app/c-blosc ubuntu20-arm64-jdk8 bash << EOF
+          mkdir build
+          cd build
+          cmake .. \
+            -DDEACTIVATE_AVX2=ON \
+            -DDEACTIVATE_SSE2=ON \
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j8 --config Release
+          EOF
+
+      - name: Build bloscjni (Linux arm64)
+        run: |
+          docker run -i -v$(pwd):/app -w /app ubuntu20-arm64-jdk8 bash <<EOF
+          cd bloscjni
+          gcc -I"\$JAVA_HOME/include" -I"\$JAVA_HOME/include/linux" \
+            -shared -lc -fPIC -o ../src/main/resources/libbloscjni-aarch64.so -O3 \
+            bloscjni.c ../c-blosc/build/blosc/libblosc.a
+          EOF
+
+      - name: Build blosc-java
+        run: mvn compile
+
+      - name: Test blosc-java
+        run: mvn test
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: bloscjni-linux-arm64
+          path: src/main/resources
+
   build_publish_jar:
-    needs: [ build_bloscjni ]
+    needs: [ build_bloscjni, build_bloscjni_linux_arm64 ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
