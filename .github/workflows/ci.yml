@@ -7,7 +7,7 @@ jobs:
   build_bloscjni:
     strategy:
       matrix:
-        os: [ ubuntu-latest, windows-latest, macos-12 ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
@@ -41,8 +41,14 @@ jobs:
             -shared -o ..\\src\\main\\resources\\libbloscjni.dll \
             bloscjni.c ..\\c-blosc\\build\\blosc\\libblosc.a
 
+      - name: Install CMake 3.x (Mac)
+        if: ${{ matrix.os == 'macos-latest' }}
+        uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "~3"
+
       - name: Build c-blosc (Mac arm64)
-        if: ${{ matrix.os == 'macos-12' }}
+        if: ${{ matrix.os == 'macos-latest' }}
         run: |
           cd c-blosc
           mkdir build-arm64
@@ -57,19 +63,20 @@ jobs:
           cmake --build . -j8 --config Release --target blosc_static
 
       - name: Build c-blosc (Mac x86_64)
-        if: ${{ matrix.os == 'macos-12' }}
+        if: ${{ matrix.os == 'macos-latest' }}
         run: |
           cd c-blosc
           mkdir build-x86_64
           cd build-x86_64
           cmake .. \
+            -DCMAKE_OSX_ARCHITECTURES=x86_64 \
             -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 \
             -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
             -DCMAKE_BUILD_TYPE=Release
           cmake --build . -j8 --config Release --target blosc_static
 
       - name: Build bloscjni (Mac universal)
-        if: ${{ matrix.os == 'macos-12' }}
+        if: ${{ matrix.os == 'macos-latest' }}
         run: |
           cd bloscjni
           cc \
@@ -110,7 +117,7 @@ jobs:
           docker run -i -v$(pwd):/app -w /app centos7-jdk8 bash <<EOF
           cd bloscjni
           gcc -I"\$JAVA_HOME/include" -I"\$JAVA_HOME/include/linux" \
-            -shared -lc -fPIC -o ../src/main/resources/libbloscjni.so -O3 \
+            -shared -lc -fPIC -o ../src/main/resources/libbloscjni-amd64.so -O3 \
             bloscjni.c ../c-blosc/build/blosc/libblosc.a
           EOF
 
@@ -120,13 +127,66 @@ jobs:
       - name: Test blosc-java
         run: mvn test
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: bloscjni-${{ matrix.os }}
           path: src/main/resources
 
+  build_bloscjni_linux_arm64:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+          cache: 'maven'
+
+      - name: Prepare resources folder
+        run: mkdir src/main/resources
+
+      - name: Build ubuntu20 arm64 docker
+        run: |
+          cd bloscjni
+          docker build -t ubuntu20-arm64-jdk8 -f Dockerfile.ubuntu20-arm64 .
+
+      - name: Build c-blosc (Linux arm64)
+        run: |
+          docker run -i -v$(pwd):/app -w /app/c-blosc ubuntu20-arm64-jdk8 bash << EOF
+          mkdir build
+          cd build
+          cmake .. \
+            -DDEACTIVATE_AVX2=ON \
+            -DDEACTIVATE_SSE2=ON \
+            -DCMAKE_POSITION_INDEPENDENT_CODE=ON \
+            -DCMAKE_BUILD_TYPE=Release
+          cmake --build . -j8 --config Release
+          EOF
+
+      - name: Build bloscjni (Linux arm64)
+        run: |
+          docker run -i -v$(pwd):/app -w /app ubuntu20-arm64-jdk8 bash <<EOF
+          cd bloscjni
+          gcc -I"\$JAVA_HOME/include" -I"\$JAVA_HOME/include/linux" \
+            -shared -lc -fPIC -o ../src/main/resources/libbloscjni-aarch64.so -O3 \
+            bloscjni.c ../c-blosc/build/blosc/libblosc.a
+          EOF
+
+      - name: Build blosc-java
+        run: mvn compile
+
+      - name: Test blosc-java
+        run: mvn test
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bloscjni-linux-arm64
+          path: src/main/resources
+
   build_publish_jar:
-    needs: [ build_bloscjni ]
+    needs: [ build_bloscjni, build_bloscjni_linux_arm64 ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -138,7 +198,7 @@ jobs:
           java-version: '8'
           cache: 'maven'
 
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         with:
           path: src/main/resources
 
@@ -151,15 +211,15 @@ jobs:
       - name: Assemble JAR
         run: mvn package
 
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: blosc-jar
           path: target/*.jar
 
       - name: Publish to Maven Central
         env:
-          JRELEASER_NEXUS2_USERNAME: ${{ secrets.JRELEASER_NEXUS2_USERNAME }}
-          JRELEASER_NEXUS2_PASSWORD: ${{ secrets.JRELEASER_NEXUS2_PASSWORD }}
+          JRELEASER_MAVENCENTRAL_SONATYPE_USERNAME: ${{ secrets.JRELEASER_MAVENCENTRAL_USERNAME }}
+          JRELEASER_MAVENCENTRAL_SONATYPE_TOKEN: ${{ secrets.JRELEASER_MAVENCENTRAL_TOKEN }}
           JRELEASER_GPG_PASSPHRASE: ${{ secrets.JRELEASER_GPG_PASSPHRASE }}
           JRELEASER_GPG_SECRET_KEY: ${{ secrets.JRELEASER_GPG_SECRET_KEY }}
           JRELEASER_GPG_PUBLIC_KEY: ${{ secrets.JRELEASER_GPG_PUBLIC_KEY }}

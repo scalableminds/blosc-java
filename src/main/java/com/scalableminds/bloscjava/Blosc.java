@@ -172,6 +172,11 @@ public class Blosc {
 
       // attempt to look up the static library in the jar file
       String libraryFileName = filePrefix + extension;
+      // On Linux, select arch-specific library
+      if (extension.equals(".so")) {
+        String arch = System.getProperty("os.arch").toLowerCase();
+        libraryFileName = filePrefix + "-" + arch + extension;
+      }
       is = Blosc.class.getClassLoader().getResourceAsStream(libraryFileName);
 
       if (is == null) {

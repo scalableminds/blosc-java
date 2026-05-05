@@ -1,0 +1,14 @@
+FROM arm64v8/ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y \
+  openjdk-8-jdk gcc make curl && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN cd /usr/local/src && \
+  curl -LO https://github.com/Kitware/CMake/releases/download/v3.22.2/cmake-3.22.2-linux-aarch64.tar.gz && \
+  tar -xf cmake-3.22.2-linux-aarch64.tar.gz && \
+  mv cmake-3.22.2-linux-aarch64 /usr/local/cmake
+
+ENV PATH="/usr/local/cmake/bin:$PATH"
+ENV JAVA_HOME=/usr/lib/jvm/java-8-openjdk-arm64
