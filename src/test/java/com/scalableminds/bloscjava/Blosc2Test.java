@@ -85,5 +85,9 @@ public class Blosc2Test {
     assertThrows(IllegalArgumentException.class, () -> Blosc2.Options.builder(4).filters(new Blosc2.FilterSpec[Blosc2.MAX_FILTERS + 1]));
     assertThrows(IllegalArgumentException.class, () -> new Blosc2.FilterSpec(Blosc2.Filter.TRUNC_PREC, 200));
     assertEquals(6, Blosc2.MAX_FILTERS);
+    // delta garbles what follows the last whole element, so it is refused; shuffle is fine with a partial element
+    Blosc2.Options delta = Blosc2.Options.builder(4).filters(new Blosc2.FilterSpec(Blosc2.Filter.DELTA)).build();
+    assertThrows(IllegalArgumentException.class, () -> Blosc2.compress(new byte[4099], delta));
+    assertArrayEquals(new byte[4099], Blosc2.decompress(Blosc2.compress(new byte[4099], 4)));
   }
 }

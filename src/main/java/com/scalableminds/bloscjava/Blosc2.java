@@ -183,6 +183,15 @@ public class Blosc2 {
     if (compcode < 0) {
       throw new IllegalArgumentException("Unknown compressor " + options.compressor.getValue());
     }
+    // C-Blosc2's delta filter garbles the bytes after the last whole element, so it gets a buffer of whole elements only
+    if (src.length % options.typeSize != 0) {
+      for (FilterSpec f : options.filters) {
+        if (f.filter == Filter.DELTA) {
+          throw new IllegalArgumentException("The delta filter needs a whole number of elements: " + src.length
+              + " bytes are not a multiple of typeSize " + options.typeSize);
+        }
+      }
+    }
     blosc2_cparams cparams = new blosc2_cparams();
     cparams.compcode((byte) compcode);
     cparams.clevel((byte) options.compressorLevel);
