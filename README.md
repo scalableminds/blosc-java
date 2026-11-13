@@ -1,8 +1,11 @@
 # blosc-java
 
-A stateless, cross-platform, JNI-based wrapper around the [c-blosc](https://github.com/Blosc/c-blosc) library.
+A stateless, cross-platform wrapper around the [C-Blosc2](https://github.com/Blosc/c-blosc2) library, through its
+[JavaCPP preset](https://github.com/bytedeco/javacpp-presets/tree/master/blosc2), which provides the native libraries
+for Windows, Mac OS (x86_64 and arm64) and Linux.
 
-The packaged JARs contain binaries for Windows, Mac OS (x86_64 and arm64) and Linux.
+Buffers are compressed in the chunk format of Blosc 1.x, which C-Blosc 1.x, numcodecs and Zarr read. Buffers in either the
+Blosc 1.x or the Blosc2 format are decompressed.
 
 ## Usage
 ```java
