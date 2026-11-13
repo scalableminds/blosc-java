@@ -1,23 +1,24 @@
 package com.scalableminds.bloscjava;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
+import org.bytedeco.blosc2.blosc2_context;
+import org.bytedeco.blosc2.blosc2_cparams;
+import org.bytedeco.blosc2.blosc2_dparams;
+import org.bytedeco.blosc2.global.blosc2;
+import org.bytedeco.javacpp.BytePointer;
+import org.bytedeco.javacpp.SizeTPointer;
 
 /**
- * A Java library for the Blosc codec. Wraps around the <a
- * href="https://github.com/Blosc/c-blosc">c-blosc library</a> with JNI.
+ * A Java library for the Blosc codec. Wraps around the <a href="https://github.com/Blosc/c-blosc2">C-Blosc2
+ * library</a> through its <a href="https://github.com/bytedeco/javacpp-presets/tree/master/blosc2">JavaCPP
+ * preset</a>, which provides the native libraries.
+ * <p>
+ * Compressed buffers are in the chunk format of Blosc 1.x, which C-Blosc 1.x, numcodecs and Zarr read.
+ * Buffers of either format, Blosc 1.x or Blosc2, are decompressed.
  */
 public class Blosc {
 
   static {
-    try {
-      System.load(loadLibraryFromJarToTemp().getAbsolutePath());
-    } catch (IOException e) {
-      throw new RuntimeException("Couldn't load libbloscjni.");
-    }
+    blosc2.blosc2_init();
   }
 
   // Disable constructor
@@ -151,52 +152,87 @@ public class Blosc {
     return decompress(src, 1);
   }
 
-  private static native byte[] _compress(byte[] src, int typesize, int clevel, int shuffle,
-      int blocksize, String cname, int numinternalthreads);
-
-  private static native byte[] _decompress(byte[] src, int numinternalthreads);
-
-
-  private static File loadLibraryFromJarToTemp() throws IOException {
-    final String os = System.getProperty("os.name").toLowerCase();
-    final String filePrefix = "libbloscjni";
-    InputStream is = null;
+  private static byte[] _compress(byte[] src, int typesize, int clevel, int shuffle, int blocksize,
+      String cname, int numinternalthreads) {
+    int compcode = blosc2.blosc2_compname_to_compcode(cname);
+    if (compcode < 0) {
+      throw new IllegalArgumentException("Unknown compressor " + cname);
+    }
+    blosc2_cparams cparams = new blosc2_cparams();
+    cparams.compcode((byte) compcode);
+    cparams.clevel((byte) clevel);
+    cparams.typesize(typesize);
+    cparams.nthreads((short) Math.max(1, numinternalthreads));
+    cparams.blocksize(blocksize);
+    cparams.splitmode(blosc2.BLOSC_FORWARD_COMPAT_SPLIT);
+    // the shuffle is the last of the filters, as in Blosc 1.x
+    byte filter = shuffle == Shuffle.BYTE_SHUFFLE.shuffle ? (byte) blosc2.BLOSC_SHUFFLE
+        : shuffle == Shuffle.BIT_SHUFFLE.shuffle ? (byte) blosc2.BLOSC_BITSHUFFLE
+            : (byte) blosc2.BLOSC_NOFILTER;
+    cparams.filters(blosc2.BLOSC2_MAX_FILTERS - 1, filter);
+    blosc2_context context = blosc2.blosc2_create_cctx(cparams);
+    if (context == null || context.isNull()) {
+      throw new RuntimeException("Error while compressing buffer");
+    }
+    // oversized, as the buffer of the JNI version was
+    long destSize = (long) src.length + blosc2.BLOSC2_MAX_OVERHEAD;
+    BytePointer srcPtr = new BytePointer(Math.max(1, src.length));
+    BytePointer destPtr = new BytePointer(destSize);
     try {
-      String extension = ".so";
-      if (os.contains("mac")) {
-        extension = ".dylib";
+      if (blosc2.blosc2_ctx_set_blosc1_format(context, true) < 0) {
+        throw new RuntimeException("Error while compressing buffer");
       }
-      if (os.contains("win")) {
-        extension = ".dll";
+      srcPtr.put(src, 0, src.length);
+      int realDestSize = blosc2.blosc2_compress_ctx(context, srcPtr, src.length, destPtr, (int) destSize);
+      if (realDestSize < 0) {
+        throw new RuntimeException("Error while compressing buffer");
       }
-
-      // attempt to look up the static library in the jar file
-      String libraryFileName = filePrefix + extension;
-      // On Linux, select arch-specific library
-      if (extension.equals(".so")) {
-        String arch = System.getProperty("os.arch").toLowerCase();
-        libraryFileName = filePrefix + "-" + arch + extension;
-      }
-      is = Blosc.class.getClassLoader().getResourceAsStream(libraryFileName);
-
-      if (is == null) {
-        throw new RuntimeException(libraryFileName + " was not found inside JAR.");
-      }
-
-      final File temp = File.createTempFile(filePrefix, extension);
-      if (temp.exists()) {
-        temp.deleteOnExit();
-      } else {
-        throw new RuntimeException("File " + temp.getAbsolutePath() + " does not exist.");
-      }
-
-      // copy the library from the Jar file to the temp destination
-      Files.copy(is, temp.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
-      return temp;
+      byte[] dest = new byte[realDestSize];
+      destPtr.get(dest, 0, realDestSize);
+      return dest;
     } finally {
-      if (is != null) {
-        is.close();
+      blosc2.blosc2_free_ctx(context);
+      srcPtr.deallocate();
+      destPtr.deallocate();
+    }
+  }
+
+  private static byte[] _decompress(byte[] src, int numinternalthreads) {
+    BytePointer srcPtr = new BytePointer(Math.max(1, src.length));
+    BytePointer destPtr = null;
+    blosc2_context context = null;
+    try {
+      srcPtr.put(src, 0, src.length);
+      // validates the buffer, and gets the size of the result from the Blosc header
+      SizeTPointer nbytes = new SizeTPointer(1);
+      if (blosc2.blosc1_cbuffer_validate(srcPtr, src.length, nbytes) < 0) {
+        throw new RuntimeException("Buffer does not contain valid blosc-encoded contents");
+      }
+      long destSize = nbytes.get();
+      if (destSize > Integer.MAX_VALUE - 8) {
+        throw new OutOfMemoryError("Cannot allocate " + destSize + " bytes for decompressed buffer");
+      }
+      destPtr = new BytePointer(Math.max(1, destSize));
+      blosc2_dparams dparams = new blosc2_dparams();
+      dparams.nthreads((short) Math.max(1, numinternalthreads));
+      context = blosc2.blosc2_create_dctx(dparams);
+      if (context == null || context.isNull()) {
+        throw new RuntimeException("Error while decompressing buffer");
+      }
+      int realDestSize = blosc2.blosc2_decompress_ctx(context, srcPtr, src.length, destPtr, (int) destSize);
+      if (realDestSize < 0) {
+        throw new RuntimeException("Error while decompressing buffer");
+      }
+      byte[] dest = new byte[realDestSize];
+      destPtr.get(dest, 0, realDestSize);
+      return dest;
+    } finally {
+      if (context != null && !context.isNull()) {
+        blosc2.blosc2_free_ctx(context);
+      }
+      srcPtr.deallocate();
+      if (destPtr != null) {
+        destPtr.deallocate();
       }
     }
   }
